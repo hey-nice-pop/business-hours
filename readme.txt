@@ -3,7 +3,4 @@ Wordpress用営業時間表示プラグイン
 
 wp/wp-content/plugin に「business-hours」フォルダごと移動→有効化
 
-不具合など
-imo_watch@icloud.com (井本)へ
-
 
