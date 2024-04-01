@@ -402,6 +402,8 @@ add_filter('enter_title_here', 'change_default_title');
 
 function business_hours()
 {
+	//タイムゾーンを日本に設定
+	date_default_timezone_set('Asia/Tokyo');
 	//今日の曜日を取得
 	$todayweek = date('w');
 
