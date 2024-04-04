@@ -409,45 +409,32 @@ add_filter('enter_title_here', 'change_default_title');
 
 function business_hours()
 {
-	//タイムゾーンを日本に設定
+	// タイムゾーンを日本に設定
 	date_default_timezone_set('Asia/Tokyo');
-	//今日の曜日を取得
 	$todayweek = date('w');
 
-	//出力用の時間や文言の取得
+	$days = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
+	$day_option = $days[$todayweek];
+	$youbi = get_option($day_option, '');
+	$check_holiday = get_option('check_' . $day_option, '');
+
 	$message_holiday = get_option('holiday', '');
 	$message_bh_prefix = get_option('bh_prefix', '');
 
-	if ($todayweek == "0") {
-		$youbi = get_option('sun', '');
-		$check_holiday = get_option('check_sun', '');
-	}
-	if ($todayweek == "1") {
-		$youbi = get_option('mon', '');
-		$check_holiday = get_option('check_mon', '');
-	}
-	if ($todayweek == "2") {
-		$youbi = get_option('tue', '');
-		$check_holiday = get_option('check_tue', '');
-	}
-	if ($todayweek == "3") {
-		$youbi = get_option('wed', '');
-		$check_holiday = get_option('check_wed', '');
-	}
-	if ($todayweek == "4") {
-		$youbi = get_option('thu', '');
-		$check_holiday = get_option('check_thu', '');
-	}
-	if ($todayweek == "5") {
-		$youbi = get_option('fri', '');
-		$check_holiday = get_option('check_fri', '');
-	}
-	if ($todayweek == "6") {
-		$youbi = get_option('sat', '');
-		$check_holiday = get_option('check_sat', '');
+	$temporary_business_hour = check_temporary_business_hours();
+	if ($temporary_business_hour) {
+		return $temporary_business_hour;
 	}
 
-	//臨時営業時間用のクエリ作成
+	if ($check_holiday == "checked") {
+		return "<span id='message_holiday'>" . $message_holiday . "</span>";
+	} else {
+		return "<span id='message_bh_prefix'>" . $message_bh_prefix . "</span><span id='bh_time'>" . $youbi . "</span>";
+	}
+}
+
+function check_temporary_business_hours()
+{
 	$today = getdate();
 	$args = array(
 		'post_type' => 'rinji',
@@ -461,34 +448,24 @@ function business_hours()
 		),
 	);
 
-	// get_postsでクエリ実行
 	$posts = get_posts($args);
 
-	// 臨時営業時間の有無を確認
 	if (!empty($posts)) {
 		foreach ($posts as $post) {
 			setup_postdata($post);
-			// 臨時営業時間の情報取得と表示処理
 			if (get_post_meta($post->ID, 'yasumi', true) == "checked") {
 				wp_reset_postdata();
-				return "<span id='message_holiday'>" . $message_holiday . "</span>";
+				return "<span id='message_holiday'>" . get_option('holiday', '') . "</span>";
 			} else {
 				$jikan = get_post_meta($post->ID, 'jikan', true);
 				wp_reset_postdata();
 				if (!empty($jikan)) {
-					return "<span id='message_bh_prefix'>" . $message_bh_prefix . "</span><span id='bh_time'>" . $jikan . "</span>";
-				} else {
-					return "<span id='message_bh_prefix'>" . $message_bh_prefix . "</span><span id='bh_time'>" . $youbi . "</span>";
+					return "<span id='message_bh_prefix'>" . get_option('bh_prefix', '') . "</span><span id='bh_time'>" . $jikan . "</span>";
 				}
 			}
 		}
-	} else {
-		// 臨時営業時間が設定されていない場合、基本営業時間または休業情報の表示
-		if ($check_holiday == "checked") {
-			return "<span id='message_holiday'>" . $message_holiday . "</span>";
-		} else {
-			return "<span id='message_bh_prefix'>" . $message_bh_prefix . "</span><span id='bh_time'>" . $youbi . "</span>";
-		}
 	}
+	return false; // 臨時営業時間がない場合は false を返す
 }
+
 add_shortcode('business_hours', 'business_hours');
