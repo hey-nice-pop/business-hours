@@ -106,181 +106,87 @@ function hours_page_contents()
 	// 初期化
 	//---------------------------------
 
-	$sun = get_option('sun', '');
-	$mon = get_option('mon', '');
-	$tue = get_option('tue', '');
-	$wed = get_option('wed', '');
-	$thu = get_option('thu', '');
-	$fri = get_option('fri', '');
-	$sat = get_option('sat', '');
-
-	$check_sun = get_option('check_sun', '');
-	$check_mon = get_option('check_mon', '');
-	$check_tue = get_option('check_tue', '');
-	$check_wed = get_option('check_wed', '');
-	$check_thu = get_option('check_thu', '');
-	$check_fri = get_option('check_fri', '');
-	$check_sat = get_option('check_sat', '');
-
-	$bh_prefix = get_option('bh_prefix', '');
-	$holiday = get_option('holiday', '');
+	$days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+	$options = [];
+	foreach ($days as $day) {
+		$options[$day] = get_option($day, '');
+		$options["check_$day"] = get_option("check_$day", '');
+	}
+	$options['bh_prefix'] = get_option('bh_prefix', '');
+	$options['holiday'] = get_option('holiday', '');
 
 	$message_html = "";
 
 	//---------------------------------
 	// 更新されたときの処理
 	//---------------------------------
+	// 更新されたときの処理
 	if (isset($_POST['submit'])) {
-
-		//営業時間を更新
-		if (isset($_POST['sun'])) {
-			update_option('sun', $_POST['sun']);
-		}
-		if (isset($_POST['mon'])) {
-			update_option('mon', $_POST['mon']);
-		}
-		if (isset($_POST['tue'])) {
-			update_option('tue', $_POST['tue']);
-		}
-		if (isset($_POST['wed'])) {
-			update_option('wed', $_POST['wed']);
-		}
-		if (isset($_POST['thu'])) {
-			update_option('thu', $_POST['thu']);
-		}
-		if (isset($_POST['fri'])) {
-			update_option('fri', $_POST['fri']);
-		}
-		if (isset($_POST['sat'])) {
-			update_option('sat', $_POST['sat']);
+		foreach ($days as $day) {
+			if (isset($_POST[$day])) {
+				update_option($day, $_POST[$day]);
+			}
+			$checkbox = "check_$day";
+			if (isset($_POST[$checkbox])) {
+				update_option($checkbox, $_POST[$checkbox]);
+			} else {
+				delete_option($checkbox);
+			}
 		}
 
-		//チェックボックスの値を更新
-		if (isset($_POST['check_sun'])) {
-			update_option('check_sun', $_POST['check_sun']);
-		} else {
-			delete_option('check_sun');
-		}
-		if (isset($_POST['check_mon'])) {
-			update_option('check_mon', $_POST['check_mon']);
-		} else {
-			delete_option('check_mon');
-		}
-		if (isset($_POST['check_tue'])) {
-			update_option('check_tue', $_POST['check_tue']);
-		} else {
-			delete_option('check_tue');
-		}
-		if (isset($_POST['check_wed'])) {
-			update_option('check_wed', $_POST['check_wed']);
-		} else {
-			delete_option('check_wed');
-		}
-		if (isset($_POST['check_thu'])) {
-			update_option('check_thu', $_POST['check_thu']);
-		} else {
-			delete_option('check_thu');
-		}
-		if (isset($_POST['check_fri'])) {
-			update_option('check_fri', $_POST['check_fri']);
-		} else {
-			delete_option('check_fri');
-		}
-		if (isset($_POST['check_sat'])) {
-			update_option('check_sat', $_POST['check_sat']);
-		} else {
-			delete_option('check_sat');
-		}
-
-		//接頭辞の更新
 		if (isset($_POST['bh_prefix'])) {
 			update_option('bh_prefix', $_POST['bh_prefix']);
 		}
-		//休日表示文の更新
 		if (isset($_POST['holiday'])) {
 			update_option('holiday', $_POST['holiday']);
 		}
 
-		//更新後の再取得
-		$sun = get_option('sun', '');
-		$mon = get_option('mon', '');
-		$tue = get_option('tue', '');
-		$wed = get_option('wed', '');
-		$thu = get_option('thu', '');
-		$fri = get_option('fri', '');
-		$sat = get_option('sat', '');
-
-		$check_sun = get_option('check_sun', '');
-		$check_mon = get_option('check_mon', '');
-		$check_tue = get_option('check_tue', '');
-		$check_wed = get_option('check_wed', '');
-		$check_thu = get_option('check_thu', '');
-		$check_fri = get_option('check_fri', '');
-		$check_sat = get_option('check_sat', '');
-
-		$bh_prefix = get_option('bh_prefix', '');
-		$holiday = get_option('holiday', '');
+		// 更新後の再取得
+		foreach ($days as $day) {
+			$options[$day] = get_option($day, '');
+			$options["check_$day"] = get_option("check_$day", '');
+		}
+		$options['bh_prefix'] = get_option('bh_prefix', '');
+		$options['holiday'] = get_option('holiday', '');
 
 		// 画面にメッセージを表示
-		$message_html = <<<EOF
-			
-<div class="notice notice-success is-dismissible">
-	<p>
-		営業時間を保存しました。
-	</p>
-</div>
-			
-EOF;
+		$message_html = '<div class="notice notice-success is-dismissible"><p>営業時間を保存しました。</p></div>';
 	}
 
 	//---------------------------------
 	// HTML表示
 	//---------------------------------
-	echo $html = <<<EOF
-
+	echo <<<EOF
 {$message_html}
 
 <div class="wrap">
-	
-	<h2>営業時間を入力してください。</h2>
-	<p>※休日はチェックボックスにチェックを入れてください。(時間は入力不要)</p>
-	
-	<form name="form1" method="post" action="">
-	
+    
+    <h2>営業時間を入力してください。</h2>
+    <p>※休日はチェックボックスにチェックを入れてください。(時間は入力不要)</p>
+    
+    <form name="form1" method="post" action="">
+EOF;
 
-	<label for="sun">日曜日：</label>
-	<input id="sun" type="text" name="sun" value="$sun" placeholder="例)10:00~18:00">
-	<input id="check_sun" type="checkbox" name="check_sun" value="checked" $check_sun ><br><br>
-	<label for="mon">月曜日：</label>
-	<input id="mon" type="text" name="mon" value="$mon">
-	<input id="check_mon" type="checkbox" name="check_mon" value="checked" $check_mon ><br><br>
-	<label for="tue">火曜日：</label>
-	<input id="tue" type="text" name="tue" value="$tue">
-	<input id="check_tue" type="checkbox" name="check_tue" value="checked" $check_tue ><br><br>
-	<label for="wed">水曜日：</label>
-	<input id="wed" type="text" name="wed" value="$wed">
-	<input id="check_wed" type="checkbox" name="check_wed" value="checked" $check_wed ><br><br>
-	<label for="thu">木曜日：</label>
-	<input id="thu" type="text" name="thu" value="$thu">
-	<input id="check_thu" type="checkbox" name="check_thu" value="checked" $check_thu ><br><br>
-	<label for="fri">金曜日：</label>
-	<input id="fri" type="text" name="fri" value="$fri">
-	<input id="check_fri" type="checkbox" name="check_fri" value="checked" $check_fri ><br><br>
-	<label for="sat">土曜日：</label>
-	<input id="sat" type="text" name="sat" value="$sat">
-	<input id="check_sat" type="checkbox" name="check_sat" value="checked" $check_sat >
-	<br><br><br>
-	<label for="bh_prefix">営業時間の接頭辞：</label>
-	<input id="bh_prefix" type="text" name="bh_prefix" value="$bh_prefix" placeholder="例)本日の営業時間"><br>
-	<p style="background-color:white; padding:8px 15px; display:inline-block;">表示例： <b>本日の営業時間</b> 10:00〜18:00</p><br>
-	<label for="holiday">休日表示文章：</label>
-	<input id="holiday" type="text" name="holiday" value="$holiday" placeholder="例)本日はお休みです。">
-	
-		<p class="submit">
-			<input type="submit" name="submit" class="button-primary" value="時間を保存" />
-		</p>
-	</form>
-	
+	foreach (['sun' => '日曜日', 'mon' => '月曜日', 'tue' => '火曜日', 'wed' => '水曜日', 'thu' => '木曜日', 'fri' => '金曜日', 'sat' => '土曜日'] as $key => $day) {
+		echo <<<EOF
+    <label for="{$key}">{$day}：</label>
+    <input id="{$key}" type="text" name="{$key}" value="{$options[$key]}" placeholder="例)10:00~18:00">
+    <input id="check_{$key}" type="checkbox" name="check_{$key}" value="checked" {$options["check_$key"]} ><br><br>
+EOF;
+	}
+
+	echo <<<EOF
+    <label for="bh_prefix">営業時間の接頭辞：</label>
+    <input id="bh_prefix" type="text" name="bh_prefix" value="{$options['bh_prefix']}" placeholder="例)本日の営業時間"><br>
+    <p style="background-color:white; padding:8px 15px; display:inline-block;">表示例： <b>本日の営業時間</b> 10:00〜18:00</p><br>
+    <label for="holiday">休日表示文章：</label>
+    <input id="holiday" type="text" name="holiday" value="{$options['holiday']}" placeholder="例)本日はお休みです。">
+    
+    <p class="submit">
+        <input type="submit" name="submit" class="button-primary" value="時間を保存" />
+    </p>
+    </form>
+    
 </div>
 EOF;
 }
