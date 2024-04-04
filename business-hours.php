@@ -342,31 +342,38 @@ function insert_rinji_custom_fields()
 {
 	global $post;
 	$jikan = get_post_meta($post->ID, 'jikan', true);
-	if (get_post_meta($post->ID, 'yasumi', true) == "checked") {
-		$yasumi_check = "checked";
-	} else {
-		$yasumi_check = "";
-	}
+	$yasumi_check = get_post_meta($post->ID, 'yasumi', true) == "checked" ? "checked" : "";
 ?>
 	<form method="post" action="admin.php?page=site_settings">
 		<label for="jikan">時間：</label>
 		<input id="jikan" type="text" name="jikan" value="<?php echo $jikan ?>"><br><br>
 		<label for="yasumi">休みならここにチェック</label>
 		<input id="yasumi" type="checkbox" name="yasumi" value="checked" <?php echo $yasumi_check ?>><br><br>
+		<!-- 隠しフィールドを追加 -->
+		<input type="hidden" name="yasumi_present" value="1">
 	</form>
 <?php
 }
+
+// 更新時の処理
 add_action('save_post', 'save_rinji_custom_fields');
-//更新時の処理
+
 function save_rinji_custom_fields($post_id)
 {
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+	if (wp_is_post_revision($post_id)) return;
+
 	if (isset($_POST['jikan'])) {
 		update_post_meta($post_id, 'jikan', $_POST['jikan']);
 	}
-	if (isset($_POST['yasumi'])) {
-		update_post_meta($post_id, 'yasumi', $_POST['yasumi']);
-	} else {
-		delete_post_meta($post_id, 'yasumi');
+
+	// 'yasumi_present' フィールドが存在する場合のみ、'yasumi' の処理を行う
+	if (isset($_POST['yasumi_present'])) {
+		if (isset($_POST['yasumi'])) {
+			update_post_meta($post_id, 'yasumi', $_POST['yasumi']);
+		} else {
+			delete_post_meta($post_id, 'yasumi');
+		}
 	}
 }
 
