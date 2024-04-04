@@ -12,50 +12,32 @@
 //メニューの追加
 add_action('admin_menu', function () {
 	add_menu_page(
-		'営業時間追加' // ページのタイトルタグ<title>に表示されるテキスト
-		,
-		'営業時間追加'   // 左メニューとして表示されるテキスト
-		,
-		'manage_options'       // 必要な権限 manage_options は通常 administrator のみに与えられた権限
-		,
-		'business-hours'        // 左メニューのスラッグ名 →URLのパラメータに使われる /wp-admin/admin.php?page=toriaezu_menu
-		,
-		'' // メニューページを表示する際に実行される関数(サブメニューがある時はこの値は空にする)
-		,
-		'dashicons-clock'       // メニューのアイコンを指定 https://developer.wordpress.org/resource/dashicons/#awards
-		,
+		'営業時間追加', // ページのタイトルタグ<title>に表示されるテキスト
+		'営業時間追加',   // 左メニューとして表示されるテキスト
+		'manage_options',       // 必要な権限 manage_options は通常 administrator のみに与えられた権限
+		'business-hours',        // 左メニューのスラッグ名 →URLのパラメータに使われる /wp-admin/admin.php?page=toriaezu_menu
+		'', // メニューページを表示する際に実行される関数(サブメニューがある時はこの値は空にする)
+		'dashicons-clock',       // メニューのアイコンを指定 https://developer.wordpress.org/resource/dashicons/#awards
 		0                             // メニューが表示される位置のインデックス(0が先頭) 5=投稿,10=メディア,20=固定ページ,25=コメント,60=テーマ,65=プラグイン,70=ユーザー,75=ツール,80=設定
 	);
 
 	add_submenu_page(
-		'business-hours'    // 親メニューのスラッグ
-		,
-		'使い方' // ページのタイトルタグ<title>に表示されるテキスト
-		,
-		'使い方' // サブメニューとして表示されるテキスト
-		,
-		'manage_options' // 必要な権限 manage_options は通常 administrator のみに与えられた権限
-		,
-		'business-hours'  // サブメニューのスラッグ名。この名前を親メニューのスラッグと同じにすると親メニューを押したときにこのサブメニューを表示します。一般的にはこの形式を採用していることが多い。
-		,
-		'howtobh' //（任意）このページのコンテンツを出力するために呼び出される関数
-		,
+		'business-hours',    // 親メニューのスラッグ
+		'使い方', // ページのタイトルタグ<title>に表示されるテキスト
+		'使い方', // サブメニューとして表示されるテキスト
+		'manage_options', // 必要な権限 manage_options は通常 administrator のみに与えられた権限
+		'business-hours',  // サブメニューのスラッグ名。この名前を親メニューのスラッグと同じにすると親メニューを押したときにこのサブメニューを表示します。一般的にはこの形式を採用していることが多い。
+		'howtobh', //（任意）このページのコンテンツを出力するために呼び出される関数
 		0
 	);
 
 	add_submenu_page(
-		'business-hours'    // 親メニューのスラッグ
-		,
-		'営業時間追加' // ページのタイトルタグ<title>に表示されるテキスト
-		,
-		'営業時間追加' // サブメニューとして表示されるテキスト
-		,
-		'manage_options' // 必要な権限 manage_options は通常 administrator のみに与えられた権限
-		,
-		'add-business-hours'  // サブメニューのスラッグ名。この名前を親メニューのスラッグと同じにすると親メニューを押したときにこのサブメニューを表示します。一般的にはこの形式を採用していることが多い。
-		,
-		'hours_page_contents' //（任意）このページのコンテンツを出力するために呼び出される関数
-		,
+		'business-hours',    // 親メニューのスラッグ
+		'営業時間追加', // ページのタイトルタグ<title>に表示されるテキスト
+		'営業時間追加', // サブメニューとして表示されるテキスト
+		'manage_options', // 必要な権限 manage_options は通常 administrator のみに与えられた権限
+		'add-business-hours',  // サブメニューのスラッグ名。この名前を親メニューのスラッグと同じにすると親メニューを押したときにこのサブメニューを表示します。一般的にはこの形式を採用していることが多い。
+		'hours_page_contents', //（任意）このページのコンテンツを出力するために呼び出される関数
 		1
 	);
 });
