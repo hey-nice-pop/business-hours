@@ -297,9 +297,7 @@ add_filter('enter_title_here', 'change_default_title');
 
 function business_hours()
 {
-	// タイムゾーンを日本に設定
-	date_default_timezone_set('Asia/Tokyo');
-	$todayweek = date('w');
+	$todayweek = wp_date('w');
 
 	$days = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
 	$day_option = $days[$todayweek];
@@ -323,15 +321,17 @@ function business_hours()
 
 function check_temporary_business_hours()
 {
-	$today = getdate();
+	$year = wp_date('Y');
+	$mon = wp_date('n');
+	$mday = wp_date('j');
 	$args = array(
 		'post_type' => 'rinji',
 		'posts_per_page' => 1,
 		'date_query' => array(
 			array(
-				'year' => $today['year'],
-				'month' => $today['mon'],
-				'day' => $today['mday'],
+				'year' => $year,
+				'month' => $mon,
+				'day' => $mday,
 			),
 		),
 	);
